@@ -1,4 +1,6 @@
 //Checks body of user data to make sure email is unique and passwords match etc...
+
+
 exports.userSignupValidator = (req, res, next) => {
     req.check("name", "Name is required.").notEmpty();
     req.check("email", "Email must be between 3 and 32 characters.")
