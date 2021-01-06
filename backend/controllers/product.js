@@ -3,6 +3,7 @@ const { errorHandler } = require('../helpers/dbErrorHandler');
 const formidable = require('formidable');
 const _ = require('lodash');
 const fs = require('fs');
+const product = require('../models/product');
 
 exports.productById = (req, res, next, id) => {
     Product.findById(id).exec((err, product) => {
@@ -123,4 +124,29 @@ exports.update = (req, res) => {
           res.json(result);  
         });
     });
+};
+
+// sell / arrival
+// by sell = /products?sortBy=sold&order=desc&limit=4
+// by arrival = /products?sortBy=createdAt&order=desc&limit=4
+// if no params are sent, then all products are returned
+
+exports.list = (req, res) => {
+    let order = req.query.order ? req.query.order : 'asc';
+    let sortBy = req.query.sortBy ? req.query.sortBy : '_id';
+    let limit = req.query.limit ? parseInt(req.query.limit) : 6;
+
+    Product.find()
+        .select('-photo')
+        .populate('category')
+        .sort([[sortBy, order]])
+        .limit(limit)
+        .exec((err, products) => {
+            if(err) {
+                return res.status(400).json({
+                        error: "Product not found"
+                });
+            }
+            res.send(products);
+        });
 };
